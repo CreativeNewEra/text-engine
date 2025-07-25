@@ -31,7 +31,7 @@ describe('enterRoom', () => {
     mockPrint.mockClear();
     onEnter.mockClear();
 
-    await expect(engine.enterRoom('start')).resolves; // not to throw
+    await expect(engine.enterRoom('start')).resolves.not.toThrow(); // not to throw
 
     expect(onEnter).toHaveBeenCalled();
     expect(mockPrint).toHaveBeenCalledWith('A room');
