@@ -955,15 +955,51 @@ let removeExtraSpaces = str => str.replace(/\s{2,}/g," ");
 
 // move the player into room with passed ID
 // string -> nothing
-let enterRoom = (id) => {
+let enterRoom = async (id) => {
   const room = getRoom(id);
 
   if (!room) {
-    println(`That exit doesn't seem to go anywhere.`);
+    println('That exit doesn\'t seem to go anywhere.');
     return;
   }
 
+  // show room image if available
   println(room.img, 'img');
+
+  // print the room name (supports arrays of names)
+  if (room.name) {
+    println(`${getName(room.name)}`, 'room-name');
+  }
+
+  // Generate a description using the local LLM on the first visit
+  let description = room.desc || '';
+  if (window.useLLM && room.visits === 0 && room.desc) {
+    try {
+      const prompt = `You are the narrator in a text adventure. The base description of the room is: "${room.desc}". Write a vivid and immersive description of this room in the style of an interactive fiction game.`;
+      const llmDesc = await callLLM(prompt);
+      if (llmDesc && typeof llmDesc === 'string') {
+        description = llmDesc.trim();
+      }
+    } catch (e) {
+      // fallback to original description
+    }
+  }
+  println(description);
+
+  room.visits++;
+  disk.roomId = id;
+
+  if (typeof room.onEnter === 'function') {
+    room.onEnter({disk, printIn, getRoom, enterRoom});
+  }
+
+  // reset any active conversation
+  delete disk.conversation;
+  delete disk.conversant;
+};
+  }
+
+  //println(room.img, 'img');
 
   if (room.name) {
     println(`${getName(room.name)}`, 'room-name');
@@ -981,7 +1017,7 @@ let enterRoom = (id) => {
     room.onEnter({disk, println, getRoom, enterRoom});
   }
 
-  // reset any active conversation
+  / reset any active conversation
   delete disk.conversation;
   delete disk.conversant;
 };
@@ -1065,6 +1101,26 @@ let topicIsAvailable = (character, topic) => {
   return prereqsOk && readOk;
 };
 
+//
+// Local LLM integration for dynamic descriptions and dialogue
+const LLM_ENDPOINT = 'http://localhost:5000/generate';
+
+async function callLLM(prompt) {
+  try {
+    const response = await fetch(LLM_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt })
+    });
+    const data = await response.json();
+    return (data && (data.text || data.response || data.result || data)) || '';
+  } catch (e) {
+    console.error('Error calling LLM:', e);
+    return '';
+  }
+}
+
+window.useLLM = true;
 // end the current conversation
 let endConversation = () => {
   disk.conversant = undefined;
