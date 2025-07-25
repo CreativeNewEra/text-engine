@@ -990,34 +990,10 @@ let enterRoom = async (id) => {
   disk.roomId = id;
 
   if (typeof room.onEnter === 'function') {
-    room.onEnter({disk, printIn, getRoom, enterRoom});
-  }
-
-  // reset any active conversation
-  delete disk.conversation;
-  delete disk.conversant;
-};
-  }
-
-  //println(room.img, 'img');
-
-  if (room.name) {
-    println(`${getName(room.name)}`, 'room-name');
-  }
-
-  if (room.visits === 0) {
-    println(room.desc);
-  }
-
-  room.visits++;
-
-  disk.roomId = id;
-
-  if (typeof room.onEnter === 'function') {
     room.onEnter({disk, println, getRoom, enterRoom});
   }
 
-  / reset any active conversation
+  // reset any active conversation
   delete disk.conversation;
   delete disk.conversant;
 };
