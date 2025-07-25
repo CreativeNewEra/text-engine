@@ -168,13 +168,13 @@ Once your game is running, the player can use the following commands:
   INV:    list inventory items
   SAVE:   save the current game
   LOAD:   load the last saved game
-  IMPORT: save to a file
-  EXPORT: load from a save file
+  IMPORT: load from a save file
+  EXPORT: save to a file
   HELP:   this help menu
 ```
 
 ## Functions
-Functions are reuseable bits of JavaScript code. text-engine provides several of these which you can use, for instance in callbacks like `onUse`, `onLook`, `onEnter`, etc.
+Functions are reusable bits of JavaScript code. text-engine provides several of these which you can use, for instance in callbacks like `onUse`, `onLook`, `onEnter`, etc.
 
 Writing and using functions is optional, but they give you a great deal more flexibility with the sort of game you can make.
 
